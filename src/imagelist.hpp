@@ -29,7 +29,7 @@ public slots:
   int size() const { return m_images.size(); }
 
 private:
-  void append(const QFileInfo &);
+  void append(const QFileInfo &, bool checkType = true);
   void scanDirectory(const QDir &);
   void sort(bool updateCurrent);
   void updateWindowTitle();

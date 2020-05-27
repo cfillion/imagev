@@ -29,7 +29,7 @@ void ImageList::build(const QStringList &args)
     if(info.isFile())
       updateCurrent = true;
 
-    append(info);
+    append(info, false);
   }
 
   // didn't find a directory
@@ -53,7 +53,7 @@ void ImageList::scanDirectory(const QDir &dir)
     append(info);
 }
 
-void ImageList::append(const QFileInfo &info)
+void ImageList::append(const QFileInfo &info, const bool checkType)
 {
   if(!info.exists()) {
     qWarning() << "imagev: file not found: " << info.filePath();
@@ -64,10 +64,12 @@ void ImageList::append(const QFileInfo &info)
     return;
   }
 
-  static QMimeDatabase db;
-  QMimeType type = db.mimeTypeForFile(info.filePath());
-  if(!type.name().startsWith("image/"))
-    return;
+  if(checkType) {
+    static QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(info.filePath());
+    if(!type.name().startsWith("image/"))
+      return;
+  }
 
   const int oldSize = m_images.size();
   auto it = m_images.insert(info);
