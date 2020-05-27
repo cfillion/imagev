@@ -6,6 +6,8 @@ ApplicationWindow {
   id: window
   visible: true
   color: 'black'
+  width: screen.desktopAvailableWidth   * 0.8
+  height: screen.desktopAvailableHeight * 0.8
 
   Shortcut {
     sequences: ['Right', 'Down', 'PgDown']
