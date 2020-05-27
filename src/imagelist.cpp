@@ -5,18 +5,11 @@
 #include <QDebug>
 #include <QDir>
 #include <QMimeDatabase>
-#include <QWindow>
 
 ImageList::ImageList()
-  : m_currentIndex{0}, m_window{nullptr}
+  : m_currentIndex{0}
 {
-  connect(this, &ImageList::currentImageChanged, this, &ImageList::updateWindowTitle);
-}
-
-void ImageList::setWindow(QWindow *win)
-{
-  m_window = win;
-  updateWindowTitle();
+  connect(this, &ImageList::currentImageChanged, this, &ImageList::currentIndexChanged);
 }
 
 void ImageList::build(const QStringList &args)
@@ -45,6 +38,8 @@ void ImageList::build(const QStringList &args)
     sort(updateCurrent);
     emit currentImageChanged();
   }
+
+  emit listChanged();
 }
 
 void ImageList::scanDirectory(const QDir &dir)
@@ -86,17 +81,10 @@ void ImageList::sort(const bool updateCurrent)
     const int newIndex = m_sorted.indexOf(current);
     if(newIndex != m_currentIndex) {
       m_currentIndex = newIndex;
-      updateWindowTitle();
+      // the index changed but the image stayed the same
+      emit currentIndexChanged();
     }
   }
-}
-
-QUrl ImageList::currentImage() const
-{
-  if(m_images.empty())
-    return {};
-
-  return QUrl::fromLocalFile(m_sorted[m_currentIndex]->filePath());
 }
 
 void ImageList::absoluteSeek(int newIndex)
@@ -114,22 +102,17 @@ void ImageList::relativeSeek(const int rel)
   absoluteSeek(m_currentIndex + rel);
 }
 
-void ImageList::updateWindowTitle()
+QString ImageList::currentImageName() const
 {
-  if(m_images.empty()) {
-    m_window->setTitle(QStringLiteral("No images"));
-    m_window->setFilePath(QStringLiteral(""));
-    return;
-  }
+  return m_images.empty() ? QString{} : m_sorted[m_currentIndex]->fileName();
+}
 
-  const QFileInfo &fileInfo = *m_sorted[m_currentIndex];
+QString ImageList::currentImagePath() const
+{
+  return m_images.empty() ? QString{} : m_sorted[m_currentIndex]->filePath();
+}
 
-  m_window->setTitle(
-    QStringLiteral("%1 [%2 of %3]")
-      .arg(fileInfo.fileName())
-      .arg(m_currentIndex + 1)
-      .arg(m_images.size())
-  );
-
-  m_window->setFilePath(fileInfo.filePath());
+QUrl ImageList::currentImageUrl() const
+{
+  return m_images.empty() ? QUrl{} : QUrl::fromLocalFile(currentImagePath());
 }

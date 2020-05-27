@@ -17,9 +17,10 @@ set(CMAKE_AUTORCC ON)
 
 add_executable(imagev
   src/comparators.cpp
-  src/main.cpp
   src/imagelist.cpp
+  src/main.cpp
   src/resources.qrc
+  src/windowhelper.cpp
 )
 
 target_compile_options(imagev PRIVATE

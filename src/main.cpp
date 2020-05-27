@@ -1,11 +1,11 @@
 #include "imagelist.hpp"
+#include "windowhelper.hpp"
 
 #include <QCommandLineParser>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QUrl>
-#include <QWindow>
 
 int main(int argc, char *argv[])
 {
@@ -22,17 +22,15 @@ int main(int argc, char *argv[])
   parser.addPositionalArgument("files", "Images ", "[files or directories...]");
   parser.process(app);
 
-  ImageList list;
+  qmlRegisterType<ImageList>("ca.cfillion.imagev", 1, 0, "ImageList");
+  qmlRegisterType<WindowHelper>("ca.cfillion.imagev", 1, 0, "WindowHelper");
 
   QQmlApplicationEngine engine;
-  engine.rootContext()->setContextProperty("list", &list);
+  engine.rootContext()->setContextProperty("files", parser.positionalArguments());
   engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
   if(engine.rootObjects().isEmpty())
     return -1;
-
-  list.setWindow(dynamic_cast<QWindow *>(engine.rootObjects().first()));
-  list.build(parser.positionalArguments());
 
   return app.exec();
 }

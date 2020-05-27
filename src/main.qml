@@ -1,13 +1,28 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Window 2.2
+import ca.cfillion.imagev 1.0
 
 ApplicationWindow {
   id: window
-  visible: true
   color: 'black'
+  visible: true
   width: screen.desktopAvailableWidth   * 0.8
   height: screen.desktopAvailableHeight * 0.8
+
+  title:
+    if(list.size == 0) 'No images [0 of 0]'
+    else `${list.currentImageName} [${list.currentIndex + 1} of ${list.size}]`
+
+  ImageList {
+    id: list
+    Component.onCompleted: build(files)
+  }
+
+  WindowHelper {
+    window: window
+    filePath: list.currentImagePath
+  }
 
   Shortcut {
     sequences: ['Right', 'Down', 'PgDown']
@@ -36,7 +51,7 @@ ApplicationWindow {
 
   Shortcut {
     sequences: ['End']
-    onActivated: list.absoluteSeek(list.size());
+    onActivated: list.absoluteSeek(list.size);
   }
 
   Shortcut {
@@ -68,7 +83,7 @@ ApplicationWindow {
       autoTransform: true
       fillMode: Image.PreserveAspectFit
       mipmap: true
-      source: list.currentImage
+      source: list.currentImageUrl
 
       width: window.width
       height: window.height
