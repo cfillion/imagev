@@ -28,3 +28,5 @@ target_compile_options(imagev PRIVATE
 )
 
 target_link_libraries(imagev Qt5::Core Qt5::Quick)
+
+install(TARGETS imagev)
