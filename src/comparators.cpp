@@ -8,5 +8,5 @@ NameComparator::NameComparator()
 
 bool NameComparator::operator()(const QFileInfo *a, const QFileInfo *b) const
 {
-  return m_collator.compare(a->fileName(), b->fileName()) < 0;
+  return m_collator.compare(a->absoluteFilePath(), b->absoluteFilePath()) < 0;
 }
