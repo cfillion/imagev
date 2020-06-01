@@ -11,7 +11,7 @@ class QDir;
 class ImageList : public QObject {
   Q_OBJECT
 
-  Q_PROPERTY(QString currentImageName READ currentImageName NOTIFY currentImageChanged);
+  Q_PROPERTY(QString currentImageName READ currentImageName NOTIFY currentImageChanged)
   Q_PROPERTY(QString currentImagePath READ currentImagePath NOTIFY currentImageChanged)
   Q_PROPERTY(QUrl    currentImageUrl  READ currentImageUrl  NOTIFY currentImageChanged)
 
