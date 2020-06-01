@@ -25,12 +25,12 @@ ApplicationWindow {
   }
 
   Shortcut {
-    sequences: ['Right', 'Down', 'PgDown']
+    sequences: ['Right', 'Down', 'PgDown', '.']
     onActivated: list.relativeSeek(+1)
   }
 
   Shortcut {
-    sequences: ['Left', 'Up', 'PgUp']
+    sequences: ['Left', 'Up', 'PgUp', ',']
     onActivated: list.relativeSeek(-1)
   }
 
