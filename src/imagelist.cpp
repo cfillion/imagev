@@ -2,6 +2,8 @@
 
 #include "comparators.hpp"
 
+#include <random>
+
 #include <QDebug>
 #include <QDir>
 #include <QMimeDatabase>
@@ -68,14 +70,20 @@ void ImageList::append(const QFileInfo &info, const bool checkType)
 
   const int oldSize = m_images.size();
   auto it = m_images.insert(info);
-  if(oldSize < m_images.size())
+  if(oldSize < m_images.size()) {
     m_sorted.append(&*it);
+    m_random.append(m_random.size());
+  }
 }
 
 void ImageList::sort(const bool updateCurrent)
 {
   const QFileInfo *current = m_sorted[m_currentIndex];
   std::sort(m_sorted.begin(), m_sorted.end(), NameComparator{});
+
+  std::random_device randomDevice;
+  std::mt19937 randomGenerator(randomDevice());
+  std::shuffle(m_random.begin(), m_random.end(), randomGenerator);
 
   if(updateCurrent) {
     const int newIndex = m_sorted.indexOf(current);
@@ -100,6 +108,12 @@ void ImageList::absoluteSeek(int newIndex)
 void ImageList::relativeSeek(const int rel)
 {
   absoluteSeek(m_currentIndex + rel);
+}
+
+void ImageList::randomSeek(const int rel)
+{
+  const unsigned int newIndex = m_random.indexOf(m_currentIndex) + rel;
+  absoluteSeek(m_random[newIndex % m_random.size()]);
 }
 
 QString ImageList::currentImageName() const

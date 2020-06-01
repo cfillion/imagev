@@ -35,6 +35,7 @@ public slots:
   void build(const QStringList &);
   void absoluteSeek(int);
   void relativeSeek(int);
+  void randomSeek(int);
 
 private:
   void append(const QFileInfo &, bool checkType = true);
@@ -43,6 +44,7 @@ private:
 
   QSet<QFileInfo> m_images;
   QList<const QFileInfo *> m_sorted;
+  QList<int> m_random;
   int m_currentIndex;
 };
 
