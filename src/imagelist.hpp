@@ -36,6 +36,7 @@ public slots:
   void absoluteSeek(int);
   void relativeSeek(int);
   void randomSeek(int);
+  void deleteCurrent();
 
 private:
   void append(const QFileInfo &, bool checkType = true);

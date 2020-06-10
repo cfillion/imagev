@@ -122,6 +122,26 @@ void ImageList::randomSeek(const int rel)
   absoluteSeek(m_random[newIndex % m_random.size()]);
 }
 
+void ImageList::deleteCurrent()
+{
+  if(m_images.empty())
+    return;
+
+  const QFileInfo *image = m_sorted[m_currentIndex];
+
+  if(!QFile::moveToTrash(image->filePath()))
+    return;
+
+  m_random.removeOne(m_currentIndex);
+  m_sorted.removeAt(m_currentIndex);
+  m_images.remove(*image);
+
+  if(m_currentIndex == m_images.size() && m_currentIndex > 0)
+    m_currentIndex--;
+
+  emit currentImageChanged();
+}
+
 QString ImageList::currentImageName() const
 {
   return m_images.empty() ? QString{} : m_sorted[m_currentIndex]->fileName();

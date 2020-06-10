@@ -22,12 +22,13 @@ Next random image     | `r`
 Previous random image | `R`
 First image           | Home
 Last image            | End
+Move to the trash     | Delete
 Toggle fullscreen     | `f`
 Quit                  | `q`
 
 ## Build from source
 
-Depends on C++11, CMake and Qt 5.
+Depends on C++11, CMake and Qt 5.15+.
 
     cmake -B build -DCMAKE_BUILD_TYPE=Release
     cmake --build build --target install

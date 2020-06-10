@@ -51,7 +51,12 @@ ApplicationWindow {
 
   Shortcut {
     sequences: ['End']
-    onActivated: list.absoluteSeek(list.size);
+    onActivated: list.absoluteSeek(list.size)
+  }
+
+  Shortcut {
+    sequences: ['Delete']
+    onActivated: list.deleteCurrent()
   }
 
   Shortcut {
