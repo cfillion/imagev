@@ -97,6 +97,9 @@ void ImageList::sort(const bool updateCurrent)
 
 void ImageList::absoluteSeek(int newIndex)
 {
+  if(m_images.empty())
+    return;
+
   newIndex = qBound(0, newIndex, m_images.size() - 1);
 
   if(newIndex != m_currentIndex) {
@@ -112,6 +115,9 @@ void ImageList::relativeSeek(const int rel)
 
 void ImageList::randomSeek(const int rel)
 {
+  if(m_images.empty())
+    return;
+
   const unsigned int newIndex = m_random.indexOf(m_currentIndex) + rel;
   absoluteSeek(m_random[newIndex % m_random.size()]);
 }
