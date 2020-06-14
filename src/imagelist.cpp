@@ -6,7 +6,19 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QMimeDatabase>
+
+static bool isImage(const QFileInfo &file)
+{
+  static const QSet<QString> imageExtensions {
+    QStringLiteral("bmp"),
+    QStringLiteral("gif"),
+    QStringLiteral("jpeg"),
+    QStringLiteral("jpg"),
+    QStringLiteral("png"),
+  };
+
+  return imageExtensions.contains(file.suffix());
+}
 
 ImageList::ImageList()
   : m_currentIndex{0}
@@ -61,12 +73,8 @@ void ImageList::append(const QFileInfo &info, const bool checkType)
     return;
   }
 
-  if(checkType) {
-    static QMimeDatabase db;
-    QMimeType type = db.mimeTypeForFile(info.filePath());
-    if(!type.name().startsWith("image/"))
-      return;
-  }
+  if(checkType && !isImage(info))
+    return;
 
   const int oldSize = m_images.size();
   auto it = m_images.insert(info);
