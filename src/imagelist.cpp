@@ -17,7 +17,7 @@ static bool isImage(const QFileInfo &file)
     QStringLiteral("png"),
   };
 
-  return imageExtensions.contains(file.suffix());
+  return imageExtensions.contains(file.suffix().toLower());
 }
 
 ImageList::ImageList()
