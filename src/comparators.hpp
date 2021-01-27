@@ -1,16 +1,20 @@
 #ifndef IMAGEV_COMPARATORS_HPP
 #define IMAGEV_COMPARATORS_HPP
 
-#include <QCollator>
-#include <QFileInfo>
+#include <memory>
+#include <string>
 
 class NameComparator {
 public:
   NameComparator();
-  bool operator()(const QFileInfo *, const QFileInfo *) const;
+  NameComparator(const NameComparator &) = delete;
+  ~NameComparator();
+
+  bool operator()(const std::string &, const std::string &) const;
 
 private:
-  QCollator m_collator;
+  struct Private;
+  std::unique_ptr<Private> m_p;
 };
 
 #endif

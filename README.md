@@ -1,16 +1,21 @@
 # ImageV
 
-This is an image viewer. It displays images from the command line or current
-directory. It provides quick access (in alphabetical or random order) to all
-other images in the same directory when opening a single image file. Animated
-images (gif) are supported.
+This is a viewer for directories of images and animations.
+
+It takes a list of files or directories as arguments. Images can be
+browsed in sorted or random order.
 
 Inspired by the venerable [feh](https://feh.finalrewind.org/) and the now
 obsolete Xee2.
 
 ## Usage
 
-    imagev [files or directories...]
+    Usage: imagev [options] <files or directories...>
+    Viewer for directories of images and animations.
+
+    Options:
+    -h, --help                      show this help and exit
+    -s, --skip                      skip files that cannot be loaded
 
 ## Shortcuts
 
@@ -28,7 +33,10 @@ Quit                  | `q`
 
 ## Build from source
 
-Depends on C++11, CMake and Qt 5.15+.
+Depends on C++17, CMake, mpv and glfw3. ICU is required on Linux. Boost on macOS.
+
+Windows is not supported at this time (todo: Win32 API collator for sorting,
+check support for Unicode filenames, move to trash).
 
     cmake -B build -DCMAKE_BUILD_TYPE=Release
     cmake --build build --target install

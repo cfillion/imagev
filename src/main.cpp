@@ -1,36 +1,32 @@
-#include "imagelist.hpp"
-#include "windowhelper.hpp"
+#include "options.hpp"
+#include "player.hpp"
+#include "window.hpp"
 
-#include <QCommandLineParser>
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QUrl>
+#include <stdexcept>
+#include <thread>
 
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  const Options options { argv };
 
-  QGuiApplication app(argc, argv);
-  QCoreApplication::setApplicationName("imagev");
-  QCoreApplication::setApplicationVersion("1.0");
+  if(options.get<bool>(Option::Help)) {
+    options.printHelp();
+    return 0;
+  }
 
-  QCommandLineParser parser;
-  parser.setApplicationDescription("Image view");
-  parser.addHelpOption();
-  parser.addVersionOption();
-  parser.addPositionalArgument("files", "Images ", "[files or directories...]");
-  parser.process(app);
+  try {
+    Player player { &options };
+    Window window { &player };
+    std::thread playlistThread {
+      &Playlist::build, player.playlist(), options.files()
+    };
+    window.loop();
+    playlistThread.join();
+  }
+  catch(const std::runtime_error &e) {
+    fprintf(stderr, "%s\n", e.what());
+    return 1;
+  }
 
-  qmlRegisterType<ImageList>("ca.cfillion.imagev", 1, 0, "ImageList");
-  qmlRegisterType<WindowHelper>("ca.cfillion.imagev", 1, 0, "WindowHelper");
-
-  QQmlApplicationEngine engine;
-  engine.rootContext()->setContextProperty("files", parser.positionalArguments());
-  engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-
-  if(engine.rootObjects().isEmpty())
-    return -1;
-
-  return app.exec();
+  return 0;
 }
