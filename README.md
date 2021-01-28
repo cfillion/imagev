@@ -1,5 +1,7 @@
 # ImageV
 
+[![Build status](https://github.com/cfillion/imagev/workflows/build/badge.svg)](https://github.com/cfillion/imagev/actions)
+
 This is a viewer for directories of images and animations.
 
 It takes a list of files or directories as arguments. Images can be
