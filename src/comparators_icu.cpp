@@ -45,14 +45,15 @@ NameComparator::~NameComparator()
     delete m_p->collator;
 }
 
-bool NameComparator::operator()(const std::string &_a, const std::string &_b)
+bool NameComparator::operator()(const std::string &a8, const std::string &b8)
 const
 {
   if(!m_p->collator)
-    return _a < _b;
+    return a8 < b8;
 
-  const icu::UnicodeString &a { icu::UnicodeString::fromUTF8(_a.c_str()) };
-  const icu::UnicodeString &b { icu::UnicodeString::fromUTF8(_b.c_str()) };
+  // TODO: cache the UTF-16 strings like in the macOS version
+  const icu::UnicodeString &a16 { icu::UnicodeString::fromUTF8(a8.c_str()) },
+                           &b16 { icu::UnicodeString::fromUTF8(b8.c_str()) };
 
-  return m_p->collator->compare(a, b) == icu::Collator::LESS;
+  return m_p->collator->compare(a16, b16) == icu::Collator::LESS;
 }

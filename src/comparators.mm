@@ -1,24 +1,36 @@
 #include "comparators.hpp"
 
-#include <vector>
+#include <unordered_map>
 
 #include <CoreServices/CoreServices.h>
 #include <Foundation/Foundation.h>
 
-struct NameComparator::Private {
-  CollatorRef collator;
+struct UniString {
+  std::unique_ptr<UniChar[]> data;
+  UniCharCount size;
 };
 
-static std::vector<unichar> unistring(const std::string &utf8, UniCharCount *length)
+struct NameComparator::Private {
+  CollatorRef collator;
+  std::unordered_map<const char *, UniString> cache;
+
+  const UniString &to_unistring(const std::string &utf8);
+};
+
+const UniString &NameComparator::Private::to_unistring(const std::string &u8)
 {
-  const NSString *str { [NSString stringWithUTF8String:utf8.c_str()] };
-  *length = [str length];
+  const auto &[it, inserted] = cache.emplace(u8.c_str(), UniString{});
+  UniString &u16 { it->second };
 
-  std::vector<unichar> buffer;
-  buffer.reserve(*length);
-  [str getCharacters:buffer.data() range:NSMakeRange(0, *length)];
+  if(!inserted)
+    return u16;
 
-  return buffer;
+  const NSString *str { [NSString stringWithUTF8String:u8.c_str()] };
+  u16.size = [str length];
+  u16.data = std::unique_ptr<UniChar[]>(new UniChar[u16.size]);
+  [str getCharacters:u16.data.get() range:NSMakeRange(0, u16.size)];
+
+  return u16;
 }
 
 NameComparator::NameComparator() : m_p { std::make_unique<Private>() }
@@ -39,18 +51,16 @@ NameComparator::~NameComparator()
     UCDisposeCollator(&m_p->collator);
 }
 
-bool NameComparator::operator()(const std::string &a, const std::string &b) const
+bool NameComparator::operator()(const std::string &a8, const std::string &b8) const
 {
   if(!m_p->collator)
-    return a < b;
+    return a8 < b8;
 
-  UniCharCount aLength, bLength;
+  const UniString &a16 { m_p->to_unistring(a8) }, &b16 { m_p->to_unistring(b8) };
 
   SInt32 order;
   UCCompareText(m_p->collator,
-    unistring(a, &aLength).data(), aLength,
-    unistring(b, &bLength).data(), bLength,
-    nullptr, &order);
+    a16.data.get(), a16.size, b16.data.get(), b16.size, nullptr, &order);
 
   return order < 0;
 }
