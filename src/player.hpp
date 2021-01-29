@@ -29,6 +29,7 @@ public:
   void playlistReady();
 
   Playlist *playlist() { return &m_playlist; }
+  const Options *options() const { return m_options; }
   const char *path() { return m_path; }
 
 private:

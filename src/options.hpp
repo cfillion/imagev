@@ -6,6 +6,7 @@
 #include <vector>
 
 enum class Option {
+  All,
   Help,
   Skip,
 };

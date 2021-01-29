@@ -16,8 +16,9 @@ obsolete Xee2.
     Viewer for directories of images and animations.
 
     Options:
-    -h, --help                      show this help and exit
-    -s, --skip                      skip files that cannot be loaded
+      -a, --all                       do not ignore files starting with .
+      -h, --help                      show this help and exit
+      -s, --skip                      skip files that cannot be loaded
 
 ## Shortcuts
 

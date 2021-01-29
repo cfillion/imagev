@@ -1,6 +1,7 @@
 #include "playlist.hpp"
 
 #include "comparators.hpp"
+#include "options.hpp"
 #include "player.hpp"
 
 #include <algorithm>
@@ -59,6 +60,9 @@ void Playlist::appendDirectory(const fs::path &dn)
   fs::error_code ec;
   for(const fs::path &fn : fs::directory_iterator(dn, ec)) {
     if(fs::is_directory(fn))
+      continue;
+    else if(!m_player->options()->get<bool>(Option::All) &&
+        fn.filename().string()[0] == '.')
       continue;
 
     appendFile(fn);
