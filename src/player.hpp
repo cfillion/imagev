@@ -3,6 +3,7 @@
 
 #include "playlist.hpp"
 
+struct mpv_event_command;
 struct mpv_event_end_file;
 struct mpv_handle;
 struct mpv_render_context;

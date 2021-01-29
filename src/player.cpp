@@ -49,6 +49,10 @@ void Player::processEvents()
     switch(event->event_id) {
     case MPV_EVENT_NONE:
       return;
+    case MPV_EVENT_IDLE:
+      m_window->update();
+      m_window->updateTitle();
+      break;
     case MPV_EVENT_END_FILE:
       fileEnded(static_cast<mpv_event_end_file *>(event->data));
       break;
@@ -124,28 +128,22 @@ void Player::fileLoaded()
 
 void Player::fileEnded(const mpv_event_end_file *event)
 {
-  if(event->reason == MPV_END_FILE_REASON_ERROR) {
-    fprintf(stderr, "error reading %s: %s\n", m_path, mpv_error_string(event->error));
+  if(event->reason != MPV_END_FILE_REASON_ERROR)
+    return;
 
-    if(m_options->get<bool>(Option::Skip)) {
-      if(m_playlist.ready())
-        m_playlist.skip();
-      else
-        m_skipOnReady = true;
-    }
-    else {
-      // the current file cannot be read
-      // clear the previous file from the screen and update the title
-      m_window->update();
-      m_window->updateTitle();
-    }
+  fprintf(stderr, "error reading %s: %s\n", m_path, mpv_error_string(event->error));
+
+  if(m_options->get<bool>(Option::Skip)) {
+    if(m_playlist.ready())
+      m_playlist.skip();
+    else
+      m_skipOnReady = true;
   }
-  else if(event->reason == MPV_END_FILE_REASON_STOP) {
-    // blank the screen and update the title when the last file is removed
-    if(m_playlist.ready() && m_playlist.empty()) {
-      m_window->update();
-      m_window->updateTitle();
-    }
+  else {
+    // the current file cannot be read
+    // clear the previous file from the screen and update the title
+    const char *cmd[] { "stop", nullptr };
+    mpv_command_async(m_mpv, 0, cmd);
   }
 }
 
@@ -160,6 +158,7 @@ void Player::playlistReady() // called from the playlist building thread
 void Player::setFile(const char *fn)
 {
   // Used for displaying in the titlebar (sometimes before the playlist is ready).
+  // fn's memory belong to the playlist
   m_path = fn;
 
   const char *cmd[] { "loadfile", fn, "replace", nullptr };
