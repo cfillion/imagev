@@ -70,6 +70,10 @@ Window::Window(Player *player) : m_player(player), m_eventFlags { 0 }
       const unsigned int codepoint) {
     getWindow(handle)->handleChar(codepoint);
   });
+
+#ifdef __APPLE__
+  nativeInit();
+#endif
 }
 
 Window::~Window()

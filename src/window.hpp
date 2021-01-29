@@ -32,14 +32,16 @@ private:
 
   void draw();
   void setTitle();
-#ifdef __APPLE__
-  void setFilePath(const char *);
-#endif
   void postEvent(EventFlag);
   void handleKey(unsigned int key, int mods);
   void handleChar(unsigned int codepoint);
   bool isFullscreen() const;
   void setFullscreen(bool);
+
+#ifdef __APPLE__
+  void nativeInit();
+  void setFilePath(const char *);
+#endif
 
   struct {
     int x, y;
