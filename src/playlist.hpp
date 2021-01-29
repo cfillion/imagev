@@ -26,7 +26,7 @@ public:
 
 private:
   void appendDirectory(const fs::path &);
-  void appendFile(const fs::path &, bool checkType = false);
+  void appendFile(const fs::path &);
   void sort(bool keepCurrentFile);
   size_t advanceShuffled(int delta) const;
   void prefetchNext();

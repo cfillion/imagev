@@ -17,16 +17,17 @@ void Playlist::build(const std::vector<const char *> &args)
   bool keepCurrentFile { false };
 
   for(const char *arg : args) {
-    const fs::path fn { arg };
+    fs::error_code ec;
+    const fs::path &fn { fs::canonical(arg, ec) };
+
+    if(ec) {
+      fprintf(stderr, "%s: %s\n", arg, ec.message().c_str());
+      continue;
+    }
 
     if(fs::is_directory(fn))
       appendDirectory(fn);
     else {
-      if(!fs::exists(fn)) {
-        fprintf(stderr, "%s: No such file or directory\n", fn.c_str());
-        continue;
-      }
-
       appendFile(fn);
       keepCurrentFile = true;
 
@@ -64,27 +65,18 @@ void Playlist::appendDirectory(const fs::path &dn)
   }
 
   if(ec) {
-    fprintf(stderr, "%s: Directory enumeration failed: %s\n",
+    fprintf(stderr, "%s: directory enumeration failed: %s\n",
       dn.c_str(), ec.message().c_str());
   }
 }
 
-void Playlist::appendFile(const fs::path &fn, const bool)
+void Playlist::appendFile(const fs::path &fn)
 {
-  fs::error_code ec;
-  const fs::path &absPath { fs::canonical(fn, ec) };
-
-  if(ec) {
-    fprintf(stderr, "%s: canonical failed: %s\n",
-      fn.c_str(), ec.message().c_str());
-    return;
-  }
-
   const auto &[it, inserted] = m_files.emplace(
 #ifdef HAVE_STD_FILESYSTEM
-    absPath.u8string()
+    fn.u8string()
 #else
-    absPath.string()
+    fn.string()
 #endif
   );
 
