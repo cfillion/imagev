@@ -32,15 +32,12 @@ void Playlist::build(const std::vector<const char *> &args)
 
       // open the first file fast!
       if(m_files.size() == 1)
-        m_player->setFile(m_files.front().c_str());
+        m_player->setFile(m_ordered.front()->c_str());
 
       if(args.size() == 1)
-        appendDirectory(fn.parent_path(), &fn);
+        appendDirectory(fn.parent_path());
     }
   }
-
-  m_shuffled.resize(m_files.size());
-  std::iota(m_shuffled.begin(), m_shuffled.end(), 0);
 
   if(!m_files.empty())
     sort(keepCurrentFile);
@@ -56,11 +53,11 @@ void Playlist::build(const std::vector<const char *> &args)
   m_player->playlistReady();
 }
 
-void Playlist::appendDirectory(const fs::path &dn, const fs::path *skip)
+void Playlist::appendDirectory(const fs::path &dn)
 {
   fs::error_code ec;
   for(const fs::path &fn : fs::directory_iterator(dn, ec)) {
-    if(fs::is_directory(fn) || (skip && *skip == fn))
+    if(fs::is_directory(fn))
       continue;
 
     appendFile(fn);
@@ -72,43 +69,46 @@ void Playlist::appendDirectory(const fs::path &dn, const fs::path *skip)
   }
 }
 
-void Playlist::appendFile(const fs::path &path, const bool)
+void Playlist::appendFile(const fs::path &fn, const bool)
 {
   fs::error_code ec;
-  const fs::path &absPath { fs::canonical(path, ec) };
+  const fs::path &absPath { fs::canonical(fn, ec) };
 
   if(ec) {
     fprintf(stderr, "%s: canonical failed: %s\n",
-      path.c_str(), ec.message().c_str());
+      fn.c_str(), ec.message().c_str());
     return;
   }
 
-  const std::string &fn {
+  const auto &[it, inserted] = m_files.emplace(
 #ifdef HAVE_STD_FILESYSTEM
     absPath.u8string()
 #else
     absPath.string()
 #endif
-  };
+  );
 
-  m_files.push_back(fn);
+  if(inserted) {
+    m_ordered.emplace_back(&*it);
+    m_shuffled.emplace_back(m_shuffled.size());
+  }
 }
 
 void Playlist::sort(const bool keepCurrentFile)
 {
-  const std::string firstFile { m_files.front() };
+  const std::string *firstFile { m_ordered.front() };
 
   // TODO: more sorting options (eg. modification date)
   NameComparator comp;
-  std::sort(m_files.begin(), m_files.end(), std::ref(comp));
+  std::sort(m_ordered.begin(), m_ordered.end(), std::ref(comp));
 
   std::random_device randomDevice;
   std::mt19937 randomGenerator { randomDevice() };
   std::shuffle(m_shuffled.begin(), m_shuffled.end(), randomGenerator);
 
   if(keepCurrentFile) {
-    const auto &match { std::find(m_files.begin(), m_files.end(), firstFile) };
-    m_position = std::distance(m_files.begin(), match);
+    const auto &match { std::find(m_ordered.begin(), m_ordered.end(), firstFile) };
+    m_position = std::distance(m_ordered.begin(), match);
   }
 }
 
@@ -127,7 +127,7 @@ void Playlist::absoluteSeek(size_t pos)
     return;
 
   m_position = pos;
-  m_player->setFile(m_files[pos].c_str());
+  m_player->setFile(m_ordered[pos]->c_str());
 
   prefetchNext();
 }
@@ -163,7 +163,7 @@ void Playlist::prefetchNext()
     pos %= m_files.size();
   }
 
-  m_player->addFile(m_files[pos].c_str());
+  m_player->addFile(m_ordered[pos]->c_str());
 }
 
 void Playlist::skip()
@@ -177,7 +177,7 @@ void Playlist::deleteCurrent()
   if(!m_ready || m_files.empty())
     return;
 
-  const std::string &fn { m_files[m_position] };
+  const std::string &fn { *m_ordered[m_position] };
 
   if(!fs::moveToTrash(fn)) {
     fprintf(stderr, "%s: could not move to trash\n", fn.c_str());
@@ -194,11 +194,12 @@ void Playlist::deleteCurrent()
       --shuffledPos;
   }
 
-  m_files.erase(m_files.begin() + m_position);
+  m_files.erase(*m_ordered[m_position]);
+  m_ordered.erase(m_ordered.begin() + m_position);
 
   if(m_position == m_files.size() && m_position > 0)
     m_position--;
 
   if(!m_files.empty())
-    m_player->setFile(m_files[m_position].c_str());
+    m_player->setFile(m_ordered[m_position]->c_str());
 }

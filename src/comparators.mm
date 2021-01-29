@@ -12,20 +12,20 @@ struct UniString {
 
 struct NameComparator::Private {
   CollatorRef collator;
-  std::unordered_map<const char *, UniString> cache;
+  std::unordered_map<const std::string *, UniString> cache;
 
-  const UniString &to_unistring(const std::string &utf8);
+  const UniString &to_unistring(const std::string *u8);
 };
 
-const UniString &NameComparator::Private::to_unistring(const std::string &u8)
+const UniString &NameComparator::Private::to_unistring(const std::string *u8)
 {
-  const auto &[it, inserted] = cache.emplace(u8.c_str(), UniString{});
+  const auto &[it, inserted] = cache.emplace(u8, UniString{});
   UniString &u16 { it->second };
 
   if(!inserted)
     return u16;
 
-  const NSString *str { [NSString stringWithUTF8String:u8.c_str()] };
+  const NSString *str { [NSString stringWithUTF8String:u8->c_str()] };
   u16.size = [str length];
   u16.data = std::unique_ptr<UniChar[]>(new UniChar[u16.size]);
   [str getCharacters:u16.data.get() range:NSMakeRange(0, u16.size)];
@@ -51,7 +51,7 @@ NameComparator::~NameComparator()
     UCDisposeCollator(&m_p->collator);
 }
 
-bool NameComparator::operator()(const std::string &a8, const std::string &b8) const
+bool NameComparator::operator()(const std::string *a8, const std::string *b8) const
 {
   if(!m_p->collator)
     return a8 < b8;

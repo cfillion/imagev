@@ -10,7 +10,7 @@ public:
   NameComparator(const NameComparator &) = delete;
   ~NameComparator();
 
-  bool operator()(const std::string &, const std::string &) const;
+  bool operator()(const std::string *, const std::string *) const;
 
 private:
   struct Private;

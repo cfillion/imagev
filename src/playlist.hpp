@@ -4,6 +4,7 @@
 #include "filesystem.hpp"
 
 #include <atomic>
+#include <unordered_set>
 #include <vector>
 
 class Player;
@@ -24,7 +25,7 @@ public:
   size_t position() const { return m_position; }
 
 private:
-  void appendDirectory(const fs::path &, const fs::path *skip = nullptr);
+  void appendDirectory(const fs::path &);
   void appendFile(const fs::path &, bool checkType = false);
   void sort(bool keepCurrentFile);
   size_t advanceShuffled(int delta) const;
@@ -33,7 +34,8 @@ private:
   Player *m_player;
 
   std::atomic_bool m_ready;
-  std::vector<std::string> m_files;
+  std::unordered_set<std::string> m_files;
+  std::vector<const std::string *> m_ordered;
   std::vector<size_t> m_shuffled;
   size_t m_position;
 
