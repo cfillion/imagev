@@ -31,6 +31,12 @@ NameComparator::NameComparator() : m_p { std::make_unique<Private>() }
   m_p->collator->setAttribute(UCOL_NUMERIC_COLLATION, UCOL_ON, status);
   if(U_FAILURE(status))
     fprintf(stderr, "NameComparator: numeric mode failed: %d\n", status);
+
+  // treat punctuation and symbols as significant (non ignorable)
+  status = U_ZERO_ERROR;
+  m_p->collator->setAttribute(UCOL_ALTERNATE_HANDLING, UCOL_NON_IGNORABLE, status);
+  if (U_FAILURE(status))
+    fprintf(stderr, "NameComparator: alternate handling failed: %d\n", status);
 }
 
 NameComparator::~NameComparator()

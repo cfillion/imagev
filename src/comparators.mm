@@ -24,7 +24,7 @@ static std::vector<unichar> unistring(const std::string &utf8, UniCharCount *len
 NameComparator::NameComparator() : m_p { std::make_unique<Private>() }
 {
   const UCCollateOptions options {
-    kUCCollateCaseInsensitiveMask |
+    kUCCollateCaseInsensitiveMask | kUCCollatePunctuationSignificantMask |
     kUCCollateDigitsAsNumberMask | kUCCollateDigitsOverrideMask
   };
 
