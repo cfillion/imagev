@@ -23,6 +23,7 @@ public:
 
   // these functions may be called from the playlist builder thread
   void setFile(const char *);
+  void addFile(const char *);
   void unloadFile();
   void playlistReady();
 

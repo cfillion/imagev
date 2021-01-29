@@ -27,6 +27,8 @@ private:
   void appendDirectory(const fs::path &, const fs::path *skip = nullptr);
   void appendFile(const fs::path &, bool checkType = false);
   void sort(bool keepCurrentFile);
+  size_t advanceShuffled(int delta) const;
+  void prefetchNext();
 
   Player *m_player;
 

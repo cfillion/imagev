@@ -23,10 +23,10 @@ Player::Player(const Options *opts)
   if(!m_mpv)
     throw std::runtime_error("mpv_create failed");
 
-  // TODO: enable prefetch-playlist?
   mpv_set_property_flag(m_mpv, "audio", false);
   mpv_set_property_flag(m_mpv, "keep-open", true);
   mpv_set_property_flag(m_mpv, "loop-file", -1);
+  mpv_set_property_flag(m_mpv, "prefetch-playlist", true);
   mpv_set_property_flag(m_mpv, "terminal", false);
 
   if(mpv_initialize(m_mpv) < 0)
@@ -162,7 +162,13 @@ void Player::setFile(const char *fn)
   // Used for displaying in the titlebar (sometimes before the playlist is ready).
   m_path = fn;
 
-  const char *cmd[] { "loadfile", fn, nullptr };
+  const char *cmd[] { "loadfile", fn, "replace", nullptr };
+  mpv_command_async(m_mpv, 0, cmd);
+}
+
+void Player::addFile(const char *fn)
+{
+  const char *cmd[] { "loadfile", fn, "append", nullptr };
   mpv_command_async(m_mpv, 0, cmd);
 }
 

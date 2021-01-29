@@ -112,6 +112,15 @@ void Playlist::sort(const bool keepCurrentFile)
   }
 }
 
+size_t Playlist::advanceShuffled(const int delta) const
+{
+  const auto &match { std::find(m_shuffled.begin(), m_shuffled.end(), m_position) };
+  auto shuffledIndex { std::distance(m_shuffled.begin(), match) };
+  shuffledIndex += delta;
+  shuffledIndex %= m_shuffled.size();
+  return m_shuffled[shuffledIndex];
+}
+
 void Playlist::absoluteSeek(size_t pos)
 {
   if(!m_ready || m_files.empty() || pos >= m_files.size() || pos == m_position)
@@ -119,6 +128,8 @@ void Playlist::absoluteSeek(size_t pos)
 
   m_position = pos;
   m_player->setFile(m_files[pos].c_str());
+
+  prefetchNext();
 }
 
 void Playlist::relativeSeek(const int delta, const bool shuffle)
@@ -128,19 +139,31 @@ void Playlist::relativeSeek(const int delta, const bool shuffle)
 
   size_t pos;
 
-  if(shuffle) {
-    const auto &match { std::find(m_shuffled.begin(), m_shuffled.end(), m_position) };
-    auto shuffledIndex { std::distance(m_shuffled.begin(), match) };
-    shuffledIndex += delta;
-    shuffledIndex %= m_shuffled.size();
-    pos = m_shuffled[shuffledIndex];
-  }
+  if(shuffle)
+    pos = advanceShuffled(delta);
   else
     pos = m_position + delta;
 
   m_lastSeek = { delta, shuffle };
 
   absoluteSeek(pos);
+}
+
+void Playlist::prefetchNext()
+{
+  if(m_files.size() < 2)
+    return;
+
+  size_t pos;
+
+  if(m_lastSeek.shuffle)
+    pos = advanceShuffled(m_lastSeek.delta);
+  else {
+    pos = m_position + m_lastSeek.delta;
+    pos %= m_files.size();
+  }
+
+  m_player->addFile(m_files[pos].c_str());
 }
 
 void Playlist::skip()
