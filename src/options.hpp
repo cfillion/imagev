@@ -8,6 +8,7 @@
 enum class Option {
   All,
   Help,
+  Recursive,
   Skip,
 };
 

@@ -15,6 +15,8 @@ struct OptionInfo {
 static const std::map<Option, OptionInfo> g_options {
   { Option::All,  { "all",  'a', false, "do not ignore files starting with ." } },
   { Option::Help, { "help", 'h', false, "show this help and exit" } },
+  { Option::Recursive,
+    { "recursive", 'r', false, "scan directories recursively" } },
   { Option::Skip, { "skip", 's', false, "skip files that cannot be loaded" } },
 };
 

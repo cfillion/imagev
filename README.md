@@ -18,6 +18,7 @@ obsolete Xee2.
     Options:
       -a, --all                       do not ignore files starting with .
       -h, --help                      show this help and exit
+      -r, --recursive                 scan directories recursively
       -s, --skip                      skip files that cannot be loaded
 
 ## Shortcuts

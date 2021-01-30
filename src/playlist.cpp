@@ -59,8 +59,11 @@ void Playlist::appendDirectory(const fs::path &dn)
 {
   fs::error_code ec;
   for(const fs::path &fn : fs::directory_iterator(dn, ec)) {
-    if(fs::is_directory(fn))
+    if(fs::is_directory(fn)) {
+      if(m_player->options()->get<bool>(Option::Recursive))
+        appendDirectory(fn);
       continue;
+    }
     else if(!m_player->options()->get<bool>(Option::All) &&
         fn.filename().string()[0] == '.')
       continue;
