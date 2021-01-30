@@ -37,7 +37,8 @@ Quit                  | `q`
 
 ## Build from source
 
-Depends on C++17, CMake, mpv and glfw3. ICU is required on Linux. Boost on macOS.
+Depends on C++17, CMake, mpv and glfw3. ICU is required on Linux.
+Boost on platforms without `<filesystem>`.
 
 Windows is not supported at this time (todo: Win32 API collator for sorting,
 check support for Unicode filenames, move to trash).
