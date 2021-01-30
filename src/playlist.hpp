@@ -12,7 +12,8 @@ class Player;
 class Playlist {
 public:
   Playlist(Player *);
-  void build(const std::vector<const char *> &args);
+  void build();
+  void abort() { m_abort = true; }
   bool ready() const { return m_ready; }
 
   void absoluteSeek(size_t);
@@ -33,7 +34,7 @@ private:
 
   Player *m_player;
 
-  std::atomic_bool m_ready;
+  std::atomic_bool m_abort, m_ready;
   std::unordered_set<std::string> m_files;
   std::vector<const std::string *> m_ordered;
   std::vector<size_t> m_shuffled;

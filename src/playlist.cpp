@@ -8,16 +8,19 @@
 #include <random>
 
 Playlist::Playlist(Player *player)
-  : m_player { player }, m_ready { false }, m_position { 0 },
-    m_lastSeek { 1, false }
+  : m_player { player }, m_abort { false }, m_ready { false },
+    m_position { 0 }, m_lastSeek { 1, false }
 {
 }
 
-void Playlist::build(const std::vector<const char *> &args)
+void Playlist::build()
 {
   bool keepCurrentFile { false };
 
-  for(const char *arg : args) {
+  for(const char *arg : m_player->options()->files()) {
+    if(m_abort)
+      return;
+
     fs::error_code ec;
     const fs::path &fn { fs::canonical(arg, ec) };
 
@@ -36,7 +39,7 @@ void Playlist::build(const std::vector<const char *> &args)
       if(m_files.size() == 1)
         m_player->setFile(m_ordered.front()->c_str());
 
-      if(args.size() == 1)
+      if(m_player->options()->files().size() == 1)
         appendDirectory(fn.parent_path());
     }
   }
@@ -59,7 +62,9 @@ void Playlist::appendDirectory(const fs::path &dn)
 {
   fs::error_code ec;
   for(const fs::path &fn : fs::directory_iterator(dn, ec)) {
-    if(fs::is_directory(fn)) {
+    if(m_abort)
+      return;
+    else if(fs::is_directory(fn)) {
       if(m_player->options()->get<bool>(Option::Recursive))
         appendDirectory(fn);
       continue;

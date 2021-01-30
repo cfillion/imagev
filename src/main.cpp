@@ -17,10 +17,9 @@ int main(int, char *argv[])
   try {
     Player player { &options };
     Window window { &player };
-    std::thread playlistThread {
-      &Playlist::build, player.playlist(), options.files()
-    };
+    std::thread playlistThread { &Playlist::build, player.playlist() };
     window.loop();
+    player.playlist()->abort();
     playlistThread.join();
   }
   catch(const std::runtime_error &e) {
