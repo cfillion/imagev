@@ -35,7 +35,7 @@ Window::Window(Player *player) : m_player(player), m_eventFlags { 0 }
   });
 
   if(!glfwInit())
-    throw std::runtime_error("glfwInit failed");
+    throw std::runtime_error { "glfwInit failed" };
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -49,7 +49,7 @@ Window::Window(Player *player) : m_player(player), m_eventFlags { 0 }
   m_handle = glfwCreateWindow(width, height, DEFAULT_TITLE, nullptr, nullptr);
 
   if(!m_handle)
-    throw std::runtime_error("glfwCreateGUIWindow failed");
+    throw std::runtime_error { "glfwCreateWindow failed" };
 
   glfwMakeContextCurrent(m_handle);
   m_player->attach(this);

@@ -21,7 +21,7 @@ Player::Player(const Options *opts)
   m_mpv = mpv_create();
 
   if(!m_mpv)
-    throw std::runtime_error("mpv_create failed");
+    throw std::runtime_error { "mpv_create failed" };
 
   mpv_set_property_flag(m_mpv, "access-references", false);
   mpv_set_property_flag(m_mpv, "audio", false);
@@ -31,7 +31,7 @@ Player::Player(const Options *opts)
   mpv_set_property_flag(m_mpv, "terminal", false);
 
   if(mpv_initialize(m_mpv) < 0)
-    throw std::runtime_error("mpv_initialize failed");
+    throw std::runtime_error { "mpv_initialize failed" };
 }
 
 Player::~Player()
@@ -84,7 +84,7 @@ void Player::attach(Window *window)
   };
 
   if(mpv_render_context_create(&m_mpv_gl, m_mpv, params) < 0)
-    throw std::runtime_error("failed to initialize mpv GL context");
+    throw std::runtime_error { "failed to initialize mpv GL context" };
 
   mpv_render_context_set_update_callback(m_mpv_gl,
     &Player::update, static_cast<void *>(this));
