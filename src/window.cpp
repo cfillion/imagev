@@ -41,6 +41,7 @@ Window::Window(Player *player) : m_player(player), m_eventFlags { 0 }
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
 
   GLFWmonitor *monitor { glfwGetPrimaryMonitor() };
   const GLFWvidmode* mode { glfwGetVideoMode(monitor) };
