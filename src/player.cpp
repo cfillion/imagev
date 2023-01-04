@@ -75,7 +75,7 @@ void Player::attach(Window *window)
 
   int advCtrl { 1 };
 
-  mpv_opengl_init_params glParams { Window::getProcAddress, nullptr, nullptr };
+  mpv_opengl_init_params glParams { Window::getProcAddress, nullptr };
   mpv_render_param params[] {
     { MPV_RENDER_PARAM_API_TYPE, const_cast<char *>(MPV_RENDER_API_TYPE_OPENGL) },
     { MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &glParams },
