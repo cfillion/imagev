@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [ macos-latest, ubuntu-20.04 ]
+        image: [ macos-latest, ubuntu-latest ]
     runs-on: ${{ matrix.image }}
     steps:
     - name: Fetch repository
