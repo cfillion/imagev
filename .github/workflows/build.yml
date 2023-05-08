@@ -1,7 +1,7 @@
 name: build
 on: [push, pull_request]
 jobs:
-  cmake:
+  meson:
     strategy:
       fail-fast: false
       matrix:
@@ -10,16 +10,21 @@ jobs:
     steps:
     - name: Fetch repository
       uses: actions/checkout@v2
-    - name: Install dependencies (Linux)
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - name: Install Meson
+      run:  sudo -H pip3 install meson
+    - name: Install system dependencies (Linux)
       if:   ${{ startsWith(matrix.image, 'ubuntu') }}
       run:  sudo apt-get install --no-install-recommends
-            g++ libglfw3-dev libicu-dev libmpv-dev
-    - name: Install dependencies (macOS)
+            g++ libglfw3-dev libicu-dev libmpv-dev ninja-build
+    - name: Install system dependencies (macOS)
       if:   ${{ startsWith(matrix.image, 'macos') }}
-      run:  brew install boost glfw mpv
-    - name: Configure
-      run:  cmake -B build -DCMAKE_BUILD_TYPE=Release
-    - name: Build
-      run:  cmake --build build
-    - name: Verify
-      run:  build/imagev --help
+      run:  brew install glfw mpv ninja
+    - name: Setup
+      run:  meson setup build
+    - name: Compile
+      run:  ninja -C build
+    - name: Test
+      run:  meson test -C build

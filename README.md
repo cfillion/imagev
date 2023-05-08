@@ -37,11 +37,13 @@ Quit                  | `q`
 
 ## Build from source
 
-Depends on C++17, CMake, mpv and glfw3. ICU is required on Linux.
+Depends on C++17, Meson, mpv and glfw3. ICU is required on Linux.
 Boost on platforms without `<filesystem>`.
 
 Windows is not supported at this time (todo: Win32 API collator for sorting,
 check support for Unicode filenames, move to trash).
 
-    cmake -B build -DCMAKE_BUILD_TYPE=Release
-    cmake --build build --target install
+    meson setup build --buildtype=release
+    cd build
+    ninja
+    meson install

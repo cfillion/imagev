@@ -1,7 +1,9 @@
 #ifndef IMAGEV_FILESYSTEM_HPP
 #define IMAGEV_FILESYSTEM_HPP
 
-#ifdef HAS_STD_FILESYSTEM
+#include "config.hpp"
+
+#ifdef HAVE_STD_FILESYSTEM
   #include <filesystem>
   namespace fs {
     using namespace std::filesystem;
