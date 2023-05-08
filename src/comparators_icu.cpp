@@ -1,19 +1,19 @@
 #include "comparators.hpp"
 
+#include <memory>
 #include <unicode/coll.h>
 
 struct NameComparator::Private {
-  icu::Collator *collator;
+  std::unique_ptr<icu::Collator> collator;
 };
 
 NameComparator::NameComparator() : m_p { std::make_unique<Private>() }
 {
   UErrorCode status { U_ZERO_ERROR };
-  m_p->collator = icu::Collator::createInstance(icu::Locale::getDefault(), status);
+  m_p->collator.reset(icu::Collator::createInstance(icu::Locale::getDefault(), status));
 
   if(U_FAILURE(status)) {
     fprintf(stderr, "NameComparator: Collator::createInstance failed: %d\n", status);
-    m_p->collator = nullptr;
     return;
   }
 
@@ -41,8 +41,6 @@ NameComparator::NameComparator() : m_p { std::make_unique<Private>() }
 
 NameComparator::~NameComparator()
 {
-  if(m_p->collator)
-    delete m_p->collator;
 }
 
 bool NameComparator::operator()(const std::string *a8, const std::string *b8)
