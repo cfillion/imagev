@@ -23,6 +23,7 @@ Player::Player(const Options *opts)
   if(!m_mpv)
     throw std::runtime_error { "mpv_create failed" };
 
+  mpv_set_option_string(m_mpv, "vo", "libmpv");
   mpv_set_property_flag(m_mpv, "access-references", false);
   mpv_set_property_flag(m_mpv, "audio", false);
   mpv_set_property_flag(m_mpv, "keep-open", true);
